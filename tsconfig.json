@@ -15,7 +15,7 @@
       "declarationMap": true /* Create sourcemaps for d.ts files. */,
       "sourceMap": true /* Create source map files for emitted JavaScript files. */,
       "rootDirs": [
-        "./src/ts",
+        "./src",
         "./test"
       ] /* Specify the root folder within your source files. */,
       "outDir": "./dist" /* Specify an output folder for all emitted files. */,
