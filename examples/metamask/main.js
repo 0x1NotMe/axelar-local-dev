@@ -11,6 +11,9 @@ const chain1 = await fetch('chain1.json').then((chain) => {
 const chain2 = await fetch('chain2.json').then((chain) => {
     return chain.json();
 });
+const deployInfo = await fetch('deployInfo.json').then((chain) => {
+    return chain.json();
+});
 const chains = [chain1, chain2];
 const getChain = (name) => {
     return chains.find(chain => name === chain.name);
@@ -35,6 +38,7 @@ async function selectChain(e) {
             chainId: "0x" + chain.chainId.toString(16),
         }]
     });
+    console.log(deployInfo);
     provider = new ethers.providers.Web3Provider(window.ethereum);
     gateway = new ethers.Contract(chain.gatewayAddress, IAxelarGateway.abi, provider);
     const ustAddress = await gateway.tokenAddresses('UST');
@@ -123,6 +127,7 @@ setInterval(async () => {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     const account = accounts[0];
     let amountIn = document.getElementById('amountIn').value;
+    
     amountIn = BigInt(amountIn * 1e6);
     const allowance = await ust.allowance(account, gateway.address);
 
@@ -133,4 +138,49 @@ setInterval(async () => {
         approveButton.disabled = false;
         sendButton.disabled = true;
     }
+
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+    gateway = new ethers.Contract(chain.gatewayAddress, IAxelarGateway.abi, provider);
+    const ustAddress = await gateway.tokenAddresses('UST');
+    ust = new ethers.Contract(ustAddress, IERC20.abi, provider);
+    var ustVal = await ust.balanceOf(account);
+    if (ustAddress == chain1.ustAddress){
+        document.getElementById('balance-user1').value = ustVal;
+        let vaultBal = await ust.balanceOf(deployInfo.vault);
+        if (vaultBal == null){
+            document.getElementById('balance-vault').value = 0;
+        } else {
+            document.getElementById('balance-vault').value = vaultBal;
+        }
+        let stratBal = await ust.balanceOf(deployInfo.strat1);
+        if (stratBal == null){
+            document.getElementById('balance-strat1').value = 0;
+        } else {
+            document.getElementById('balance-strat1').value = stratBal;
+        }
+        document.getElementById('chain1').style.backgroundColor = "rgba(255, 255, 255, 1)";
+        document.getElementById('chain2').style.backgroundColor = "rgba(255, 0, 0, 0.2)";
+        document.getElementById('balance-user1').disabled = false;
+        document.getElementById('balance-strat1').disabled = false;
+        document.getElementById('balance-vault').disabled = false;
+        document.getElementById('balance-user2').disabled = true;
+        document.getElementById('balance-strat2').disabled = true;
+        
+    } else {
+        document.getElementById('balance-user2').value = ustVal;
+        let stratBal = await ust.balanceOf(deployInfo.strat2);
+        if (stratBal == null){
+            document.getElementById('balance-strat2').value = 0;
+        } else {
+            document.getElementById('balance-strat2').value = stratBal;
+        }
+        document.getElementById('chain1').style.backgroundColor = "rgba(255, 0, 0, 0.2)";
+        document.getElementById('chain2').style.backgroundColor = "rgba(255, 255, 255, 1)";
+        document.getElementById('balance-user1').disabled = true;
+        document.getElementById('balance-strat1').disabled = true;
+        document.getElementById('balance-vault').disabled = true;
+        document.getElementById('balance-user2').disabled = false;
+        document.getElementById('balance-strat2').disabled = false;
+    }
+    
 }, 1000);

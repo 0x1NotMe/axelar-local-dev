@@ -1,34 +1,66 @@
 <!DOCTYPE html>
 <html lang="en-US">
- 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- <meta http-equiv="refresh" content="1"> -->
     <script type="module" src="./main.js"></script>
-        <script
-        src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
-        type="application/javascript">
-    </script>
-</head>
- 
-<body>
+    <script
+      src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
+      type="application/javascript"
+    ></script>
+    <script
+      src="../../dist/networkUtils.js"
+      type="application/javascript"
+    ></script>
+  </head>
+
+  <body>
     <div id="chainDiv">
-        <label>Chain: </label>
-        <select id="chain"></select>
-        <button id="track">Add UST to Wallet</button>
+      <label>Chain: </label>
+      <select id="chain"></select>
+      <button id="track">Add UST to Wallet</button>
     </div>
     <div>
-        <label>Destination Address:</label>
-        <input id="destinationAddress" style="width: 320px"/> 
-        <button id="auto">Auto</button>
+      <label>Destination Address:</label>
+      <input id="destinationAddress" style="width: 320px" />
+      <button id="auto">Auto</button>
     </div>
     <div>
-        <label>Amount In:</label>
-        <input type="number" min="0" id="amountIn"/>
+      <label>Amount In:</label>
+      <input type="number" min="0" id="amountIn" />
     </div>
     <div>
-        <button id="approve">Approve</button>
-        <button id="send">Send</button>
+      <button id="approve">Approve</button>
+      <button id="send">Send</button>
     </div>
-</body>
- 
+    <div>--------------------------------------</div>
+    <span id="chain1">chain 1</span>
+    <div>
+      <span>User Balance</span>
+      <input id="balance-user1" />
+    </div>
+    <div>
+      <span>Vault Balance</span>
+      <input id="balance-vault" />
+      <!-- <button id="approve-vault-spend">Approve</button>
+      <button id="send-vault">Send</button> -->
+    </div>
+    <div>
+        <span>Strategy Balance</span>
+        <input id="balance-strat1" />
+    </div>
+    <div>--------------------------------------</div>
+    <div >
+      <span id="chain2">chain 2</span>
+      <div>
+        <span>User Balance</span>
+        <input id="balance-user2" />
+      </div>
+      <div>
+        <span>Strategy Balance</span>
+        <input id="balance-strat2" />
+    </div>
+    </div>
+  </body>
+</html>
