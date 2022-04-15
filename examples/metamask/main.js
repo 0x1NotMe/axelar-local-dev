@@ -39,8 +39,8 @@ let ust;
 let vault;
 let st1;
 let st2;
-let user1;
-let user2;
+// let user1;
+// let user2;
 const gasLimit = 11473448;
 const gasPrice = new ethers.BigNumber.from("20000000000");
 
@@ -65,7 +65,7 @@ async function selectChain(e) {
         console.log("retrieving chain1 contracts");
         vault = new ethers.Contract(deployInfo.vault, IERC4626.abi, provider);
         st1 = new ethers.Contract(deployInfo.strat1, SampleStrategy.abi, provider);
-        user1 = new ethers.Wallet("0x7f47466019ec556ec0b36b3c9033b41b34a6b98f108b0ff60f89e012f7cd1873", provider);
+        // user1 = new ethers.Wallet("0x7f47466019ec556ec0b36b3c9033b41b34a6b98f108b0ff60f89e012f7cd1873", provider);
         let stratValue = await st1.value();
         if (stratValue == null){
             document.getElementById('value-strat1').value = 0;
@@ -73,14 +73,12 @@ async function selectChain(e) {
             document.getElementById('value-strat1').value = stratValue;
         }
         console.log("contracts retrieved");
-        console.log(vault);
     } else {
         console.log("retrieving chain2 contracts");
         st2 = new ethers.Contract(deployInfo.strat2, SampleStrategy.abi, provider);
-        user2 = new ethers.Wallet("0x7f47466019ec556ec0b36b3c9033b41b34a6b98f108b0ff60f89e012f7cd1873", provider);
+        // user2 = new ethers.Wallet("0x7f47466019ec556ec0b36b3c9033b41b34a6b98f108b0ff60f89e012f7cd1873", provider);
 
         let stratValue = await st2.value();
-        console.log(stratValue);
         if (stratValue == null){
             document.getElementById('value-strat2').value = 0;
         } else {
@@ -177,7 +175,7 @@ async function approveVault() {
     // const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     // const account = accounts[0];
 
-    await(await ust.connect(signer).approve(vault.address, 10000000)).wait();
+    await(await ust.connect(signer).approve(vault.address, document.getElementById('deposit-amount').value)).wait();
     console.log("vault approval successful");
 }
 
@@ -187,7 +185,7 @@ depositVaultButton.addEventListener('click', depositVault);
 async function depositVault() {
     
     const signer = provider.getSigner();
-    await(await vault.connect(signer).deposit(10000, vault.address, { gasLimit:gasLimit, gasPrice: gasPrice})).wait();
+    await(await vault.connect(signer).deposit(document.getElementById('deposit-amount').value, vault.address, { gasLimit:gasLimit, gasPrice: gasPrice})).wait();
     console.log("vault deposit successful");
 }
 
@@ -243,7 +241,32 @@ setInterval(async () => {
     // ust = new ethers.Contract(ustAddress, IERC20.abi, provider);
     var ustVal = await ust.balanceOf(account);
     if (ustAddress == chain1.ustAddress){
+        document.getElementById('chain1').style.backgroundColor = "rgba(255, 255, 255, 1)";
+        document.getElementById('chain2').style.backgroundColor = "rgba(255, 0, 0, 0.2)";
+        document.getElementById('balance-user1').disabled = false;
+        document.getElementById('deposit-amount').disabled = false;
+        document.getElementById('balance-vault').disabled = false;
+        document.getElementById('balance-strat1').disabled = false;
+        document.getElementById('value-strat1').disabled = false;
+        document.getElementById('send-value-strat1').disabled = false;
+        document.getElementById('balance-user2').disabled = true;
+        document.getElementById('balance-strat2').disabled = true;
+        document.getElementById('value-strat2').disabled = true;
+        document.getElementById('send-value-strat2').disabled = true;
         document.getElementById('balance-user1').value = ustVal;
+
+        let vaultAmountIn = document.getElementById('deposit-amount').value;
+        // amountIn = BigInt(amountIn * 1e6);
+        const vaultAllowance = await ust.allowance(account, vault.address);
+    
+        if (vaultAllowance >= vaultAmountIn) {
+            approveVaultButton.disabled = true;
+            depositVaultButton.disabled = false;
+        } else {
+            approveVaultButton.disabled = false;
+            depositVaultButton.disabled = true;
+        }        
+
         let vaultBal = await ust.balanceOf(deployInfo.vault);
         if (vaultBal == null){
             document.getElementById('balance-vault').value = 0;
@@ -255,36 +278,12 @@ setInterval(async () => {
             document.getElementById('balance-strat1').value = 0;
         } else {
             document.getElementById('balance-strat1').value = stratBal;
-        }
-
-        
-
-        document.getElementById('chain1').style.backgroundColor = "rgba(255, 255, 255, 1)";
-        document.getElementById('chain2').style.backgroundColor = "rgba(255, 0, 0, 0.2)";
-        document.getElementById('balance-user1').disabled = false;
-        document.getElementById('balance-vault').disabled = false;
-        document.getElementById('approve-vault').disabled = false;
-        document.getElementById('deposit-vault').disabled = false;
-        document.getElementById('balance-strat1').disabled = false;
-        document.getElementById('value-strat1').disabled = false;
-        document.getElementById('send-value-strat1').disabled = false;
-        document.getElementById('balance-user2').disabled = true;
-        document.getElementById('balance-strat2').disabled = true;
-        document.getElementById('value-strat2').disabled = true;
-        document.getElementById('send-value-strat2').disabled = true;
-        
+        }     
     } else {
-        document.getElementById('balance-user2').value = ustVal;
-        let stratBal = await ust.balanceOf(deployInfo.strat2);
-        if (stratBal == null){
-            document.getElementById('balance-strat2').value = 0;
-        } else {
-            document.getElementById('balance-strat2').value = stratBal;
-        }
-
         document.getElementById('chain1').style.backgroundColor = "rgba(255, 0, 0, 0.2)";
         document.getElementById('chain2').style.backgroundColor = "rgba(255, 255, 255, 1)";
         document.getElementById('balance-user1').disabled = true;
+        document.getElementById('deposit-amount').disabled = true;
         document.getElementById('balance-vault').disabled = true;
         document.getElementById('approve-vault').disabled = true;
         document.getElementById('deposit-vault').disabled = true;
@@ -295,6 +294,13 @@ setInterval(async () => {
         document.getElementById('balance-strat2').disabled = false;
         document.getElementById('value-strat2').disabled = false;
         document.getElementById('send-value-strat2').disabled = false;
+        document.getElementById('balance-user2').value = ustVal;
+
+        let stratBal = await ust.balanceOf(deployInfo.strat2);
+        if (stratBal == null){
+            document.getElementById('balance-strat2').value = 0;
+        } else {
+            document.getElementById('balance-strat2').value = stratBal;
+        }
     }
-    
 }, 1000);

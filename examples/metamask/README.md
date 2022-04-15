@@ -7,6 +7,13 @@ First run `createNetworks.js` in the background specifying an address to fund. T
 cd node_modules/@axelar-network/axelar-local-dev/examples/metamask
 node createNetworks.js <your metamask address goes here>
 ```
+## Deploying contracts
+
+Run deploy.js to deploy vault and strategy prototype
+```
+cd examples/metamask
+node deploy.js
+```
 
 ## Connecting to metamask
 While the above is running go to your browser and add the two created networks to metamask. This will be done twice, once for each chain. Open Metamask and click on the Network on the top right and chose *'Create new Network'*. Then fill the following information and click *'Save'*.
